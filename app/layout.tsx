@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     description: SITE.tagline,
     url: "https://egotop.lol",
     siteName: SITE.name,
-    images: [{ url: "/egotop-og.png", width: 1200, height: 630 }],
+    images: [{ url: "/egotop-og.png", width: 1200, height: 1200 }],
     locale: "pt_BR",
     type: "website",
   },
