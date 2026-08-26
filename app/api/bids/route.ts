@@ -17,7 +17,7 @@ const bodySchema = z.object({
     .min(2)
     .max(40)
     .transform((s) => s.trim().toLowerCase().replace(/^@/, "")),
-  amountCents: z.number().int().positive().max(100_000_00), // tope R$100k
+  amountCents: z.number().int().positive().max(2_000_000_000), // ~R$20M (límite seguro del Int de la DB)
   name: z.string().max(80).optional(),
   bio: z.string().max(200).optional(),
   avatarUrl: z.string().url().max(400).optional().or(z.literal("")),

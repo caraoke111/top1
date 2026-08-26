@@ -261,10 +261,10 @@ export default function BidModal({
                 />
               </Field>
 
-              {/* Monto libre */}
+              {/* Monto libre (sin tope) */}
               <Field label="Seu lance (R$) *">
-                <div className="relative">
-                  <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 font-mono text-lg text-[color:var(--color-ink-soft)]">
+                <div className="flex items-center overflow-hidden rounded-lg border-2 border-line bg-cream focus-within:border-ink">
+                  <span className="pl-3 pr-1 font-mono text-lg text-[color:var(--color-ink-soft)]">
                     R$
                   </span>
                   <input
@@ -273,13 +273,21 @@ export default function BidModal({
                       setReais(e.target.value.replace(/[^0-9.,]/g, ""))
                     }
                     inputMode="decimal"
-                    className="input pl-10 font-mono text-xl font-semibold"
+                    placeholder="0,00"
+                    className="w-full border-0 bg-transparent px-1 py-2 font-mono text-xl font-semibold outline-none"
                   />
                 </div>
-                {/* Atajos rápidos */}
+                {/* Atajos (solo sugerencias — podés escribir cualquier monto) */}
                 <div className="mt-2 flex flex-wrap gap-1.5">
-                  {[minCents, minCents + 100, minCents + 500, minCents + 2000].map(
-                    (c) => (
+                  {Array.from(
+                    new Set(
+                      [minCents, 1000, 10000, 100000, 1000000].filter(
+                        (c) => c >= minCents
+                      )
+                    )
+                  )
+                    .slice(0, 4)
+                    .map((c) => (
                       <button
                         key={c}
                         type="button"
@@ -288,13 +296,12 @@ export default function BidModal({
                       >
                         {formatBRL(c)}
                       </button>
-                    )
-                  )}
+                    ))}
                 </div>
                 <p className="mt-1 text-[11px] text-[color:var(--color-ink-soft)]">
                   {targetName
-                    ? `Para passar ${targetName}, mínimo ${formatBRL(minCents)}.`
-                    : `Lance mínimo: ${formatBRL(minCents)}.`}
+                    ? `Para passar ${targetName}, mínimo ${formatBRL(minCents)}. Sem teto — o céu é o limite.`
+                    : `Lance mínimo: ${formatBRL(minCents)}. Sem teto — aposte quanto quiser.`}
                 </p>
               </Field>
             </div>
