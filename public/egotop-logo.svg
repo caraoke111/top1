@@ -1,0 +1,20 @@
+<svg width="900" height="300" viewBox="0 0 900 300" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&amp;display=swap');
+      .marker { font-family: 'Permanent Marker', 'Arial Black', system-ui, sans-serif; }
+    </style>
+  </defs>
+
+  <!-- corona sobre la E -->
+  <g stroke="#1C1915" stroke-width="9" stroke-linejoin="round" fill="#F26430" transform="translate(150 40) scale(0.85)">
+    <path d="M 0 90 L 0 30 L 34 62 L 68 12 L 102 62 L 136 30 L 136 90 Z"/>
+    <rect x="0" y="86" width="136" height="24" rx="6"/>
+    <circle cx="0" cy="30" r="10" fill="#FAF6F1"/>
+    <circle cx="68" cy="12" r="12" fill="#FAF6F1"/>
+    <circle cx="136" cy="30" r="10" fill="#FAF6F1"/>
+  </g>
+
+  <!-- wordmark -->
+  <text x="80" y="235" class="marker" font-size="150" fill="#1C1915">Ego<tspan fill="#F26430">Top</tspan></text>
+</svg>

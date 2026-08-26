@@ -1,0 +1,32 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Permanent+Marker&amp;display=swap');
+      .marker { font-family: 'Permanent Marker', 'Arial Black', system-ui, sans-serif; }
+    </style>
+  </defs>
+
+  <!-- fondo -->
+  <rect width="512" height="512" rx="96" fill="#FAF6F1"/>
+
+  <!-- sombra dura del sticker -->
+  <rect x="78" y="88" width="372" height="372" rx="60" fill="#1C1915"/>
+  <!-- sticker naranja -->
+  <rect x="62" y="72" width="372" height="372" rx="60" fill="#F26430" stroke="#1C1915" stroke-width="12"/>
+
+  <!-- corona -->
+  <g stroke="#1C1915" stroke-width="11" stroke-linejoin="round" fill="#FAF6F1">
+    <path d="M 150 250 L 150 165 L 200 210 L 248 138 L 296 210 L 346 165 L 346 250 Z"/>
+    <rect x="150" y="246" width="196" height="34" rx="8"/>
+    <circle cx="150" cy="165" r="13"/>
+    <circle cx="248" cy="138" r="15"/>
+    <circle cx="346" cy="165" r="13"/>
+  </g>
+  <!-- gemas de la corona -->
+  <circle cx="200" cy="263" r="7" fill="#F26430"/>
+  <circle cx="248" cy="263" r="7" fill="#E03B2F"/>
+  <circle cx="296" cy="263" r="7" fill="#F26430"/>
+
+  <!-- texto EGO -->
+  <text x="248" y="392" text-anchor="middle" class="marker" font-size="104" fill="#FAF6F1" stroke="#1C1915" stroke-width="3" letter-spacing="2">EGO</text>
+</svg>

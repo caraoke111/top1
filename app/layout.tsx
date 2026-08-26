@@ -22,8 +22,25 @@ const mono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://egotop.lol"),
   title: `${SITE.name} — ${SITE.tagline}`,
   description: SITE.tagline,
+  icons: { icon: "/egotop-icon.png", apple: "/egotop-icon.png" },
+  openGraph: {
+    title: `${SITE.name} — ${SITE.tagline}`,
+    description: SITE.tagline,
+    url: "https://egotop.lol",
+    siteName: SITE.name,
+    images: [{ url: "/egotop-og.png", width: 1200, height: 630 }],
+    locale: "pt_BR",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${SITE.name} — ${SITE.tagline}`,
+    description: SITE.tagline,
+    images: ["/egotop-og.png"],
+  },
 };
 
 export default function RootLayout({
