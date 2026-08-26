@@ -42,6 +42,22 @@ export function profileUrl(
   return `https://instagram.com/${handle}`;
 }
 
+// Resuelve la foto de avatar: 1) URL propia si la cargó; 2) TikTok automático
+// (unavatar, gratis); 3) vacío → el componente muestra las iniciales.
+// Instagram no se puede traer gratis, así que va manual (URL) o iniciales.
+export function resolveAvatar(
+  handle: string,
+  avatarUrl: string,
+  links?: { url: string }[]
+): string {
+  if (avatarUrl) return avatarUrl;
+  const url = (links?.[0]?.url || "").toLowerCase();
+  if (url.includes("tiktok.com")) {
+    return `https://unavatar.io/tiktok/${handle.replace(/^@/, "")}`;
+  }
+  return "";
+}
+
 export function formatBRL(cents: number): string {
   return (cents / 100).toLocaleString("pt-BR", {
     style: "currency",

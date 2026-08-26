@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { RULES, formatBRL, priceToBeat } from "@/lib/site";
 import type { RankRow } from "@/lib/types";
+import Avatar from "@/components/Avatar";
 
 const FLAGS = ["🇧🇷", "🇵🇹", "🇺🇸", "🇪🇸", "🇦🇷", "🇺🇾", "🌐"];
 const CATEGORIES = [
@@ -254,16 +255,7 @@ export default function BidModal({
                             className="flex w-full items-center gap-2 px-3 py-2 text-left hover:bg-cream-200"
                           >
                             <span className="grid h-7 w-7 shrink-0 place-items-center overflow-hidden rounded-full bg-[linear-gradient(135deg,#9b6ee8,#1c1915)] text-[10px] font-bold text-cream">
-                              {r.avatarUrl ? (
-                                // eslint-disable-next-line @next/next/no-img-element
-                                <img
-                                  src={r.avatarUrl}
-                                  alt=""
-                                  className="h-full w-full object-cover"
-                                />
-                              ) : (
-                                r.name.slice(0, 2).toUpperCase()
-                              )}
+                              <Avatar src={r.avatarUrl} name={r.name} />
                             </span>
                             <span className="min-w-0 flex-1">
                               <span className="block truncate text-sm font-semibold">

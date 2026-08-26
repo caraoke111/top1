@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { RULES, priceToBeat, profileUrl } from "@/lib/site";
+import { RULES, priceToBeat, profileUrl, resolveAvatar } from "@/lib/site";
 import type { RankRow, Widgets } from "@/lib/types";
 
 export interface CreatorPayload {
@@ -105,7 +105,7 @@ export async function getRanking(): Promise<RankRow[]> {
       handle: c.handle,
       name: c.name,
       bio: c.bio,
-      avatarUrl: c.avatarUrl,
+      avatarUrl: resolveAvatar(c.handle, c.avatarUrl, links),
       country: c.country,
       category: c.category,
       verified: c.verified,
@@ -139,7 +139,7 @@ export async function getWidgets(): Promise<Widgets> {
       mostClicked24h = {
         handle: c.handle,
         name: c.name,
-        avatarUrl: c.avatarUrl,
+        avatarUrl: resolveAvatar(c.handle, c.avatarUrl, safeJson(c.links) || []),
         profileUrl: profileUrl(c.handle, safeJson(c.links) || []),
         clicks: grouped[0]._count.creatorId,
       };
@@ -157,7 +157,7 @@ export async function getWidgets(): Promise<Widgets> {
       longestReign = {
         handle: c.handle,
         name: c.name,
-        avatarUrl: c.avatarUrl,
+        avatarUrl: resolveAvatar(c.handle, c.avatarUrl, safeJson(c.links) || []),
         profileUrl: profileUrl(c.handle, safeJson(c.links) || []),
         secs,
       };
@@ -171,7 +171,7 @@ export async function getWidgets(): Promise<Widgets> {
     ? {
         handle: king.handle,
         name: king.name,
-        avatarUrl: king.avatarUrl,
+        avatarUrl: resolveAvatar(king.handle, king.avatarUrl, safeJson(king.links) || []),
         profileUrl: profileUrl(king.handle, safeJson(king.links) || []),
         amountCents: king.currentAmountCents,
       }

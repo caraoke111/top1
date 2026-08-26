@@ -2,6 +2,7 @@
 
 import { T, formatBRL } from "@/lib/site";
 import type { RankRow } from "@/lib/types";
+import Avatar from "@/components/Avatar";
 
 function rankBadge(rank: number) {
   if (rank === 1) return "⚡1";
@@ -42,12 +43,7 @@ function Row({
 
       {/* avatar */}
       <div className="grid h-11 w-11 shrink-0 place-items-center overflow-hidden rounded-full bg-[linear-gradient(135deg,#9b6ee8,#1c1915)] text-sm font-bold text-cream">
-        {row.avatarUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={row.avatarUrl} alt="" className="h-full w-full object-cover" />
-        ) : (
-          row.name.slice(0, 2).toUpperCase()
-        )}
+        <Avatar src={row.avatarUrl} name={row.name} />
       </div>
 
       {/* info */}

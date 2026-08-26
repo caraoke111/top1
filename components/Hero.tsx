@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { SITE, T, formatBRL } from "@/lib/site";
 import type { RankRow, Stats } from "@/lib/types";
+import Avatar from "@/components/Avatar";
 
 export default function Hero({
   liveCount,
@@ -71,13 +72,12 @@ export default function Hero({
 
         {/* tarjeta del rey */}
         <div className="card-hard mx-auto mt-8 flex max-w-md items-center gap-3 rounded-2xl bg-cream-200 p-3 text-left">
-          <div className="grid h-12 w-12 place-items-center rounded-full bg-[linear-gradient(135deg,#f09433,#bc1888)] text-xl">
-            {king?.avatarUrl ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+          <div className="grid h-12 w-12 place-items-center overflow-hidden rounded-full bg-[linear-gradient(135deg,#f09433,#bc1888)] text-xl">
+            {king ? (
+              <Avatar
                 src={king.avatarUrl}
-                alt=""
-                className="h-full w-full rounded-full object-cover"
+                name={king.name}
+                imgClassName="h-full w-full rounded-full object-cover"
               />
             ) : (
               "👑"
