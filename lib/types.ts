@@ -14,6 +14,7 @@ export interface RankRow {
   category: string;
   verified: boolean;
   links: CreatorLink[];
+  profileUrl: string;
   clicks: number;
   amountCents: number;
   priceToBeatCents: number;
@@ -25,18 +26,21 @@ export interface Widgets {
     handle: string;
     name: string;
     avatarUrl: string;
+    profileUrl: string;
     clicks: number;
   } | null;
   longestReign: {
     handle: string;
     name: string;
     avatarUrl: string;
+    profileUrl: string;
     secs: number;
   } | null;
   biggestEgo: {
     handle: string;
     name: string;
     avatarUrl: string;
+    profileUrl: string;
     amountCents: number;
   } | null;
   entryPriceCents: number;

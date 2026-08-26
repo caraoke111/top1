@@ -59,10 +59,10 @@ function Row({
         </p>
         <p className="truncate text-xs text-[color:var(--color-ink-soft)]">
           <a
-            href={`https://instagram.com/${row.handle}`}
+            href={row.profileUrl}
             target="_blank"
             rel="noopener noreferrer"
-            title={`Ver @${row.handle} no Instagram`}
+            title={`Ver perfil de @${row.handle}`}
             className="text-violet hover:underline"
           >
             @{row.handle}

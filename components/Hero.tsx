@@ -59,10 +59,10 @@ export default function Hero({
             <p className="truncate font-bold">
               {king ? (
                 <a
-                  href={`https://instagram.com/${king.handle}`}
+                  href={king.profileUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  title={`Ver @${king.handle} no Instagram`}
+                  title={`Ver perfil de @${king.handle}`}
                   className="hover:text-violet hover:underline"
                 >
                   {king.name}

@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { RULES, priceToBeat } from "@/lib/site";
+import { RULES, priceToBeat, profileUrl } from "@/lib/site";
 import type { RankRow, Widgets } from "@/lib/types";
 
 export interface CreatorPayload {
@@ -104,22 +104,26 @@ export async function getRanking(): Promise<RankRow[]> {
     take: RULES.rankingSize,
   });
 
-  return creators.map((c, i) => ({
-    id: c.id,
-    rank: i + 1,
-    handle: c.handle,
-    name: c.name,
-    bio: c.bio,
-    avatarUrl: c.avatarUrl,
-    country: c.country,
-    category: c.category,
-    verified: c.verified,
-    links: safeJson(c.links) || [],
-    clicks: c.clicks,
-    amountCents: c.currentAmountCents,
-    priceToBeatCents: priceToBeat(c.currentAmountCents),
-    isKing: i === 0,
-  }));
+  return creators.map((c, i) => {
+    const links = safeJson(c.links) || [];
+    return {
+      id: c.id,
+      rank: i + 1,
+      handle: c.handle,
+      name: c.name,
+      bio: c.bio,
+      avatarUrl: c.avatarUrl,
+      country: c.country,
+      category: c.category,
+      verified: c.verified,
+      links,
+      profileUrl: profileUrl(c.handle, links),
+      clicks: c.clicks,
+      amountCents: c.currentAmountCents,
+      priceToBeatCents: priceToBeat(c.currentAmountCents),
+      isKing: i === 0,
+    };
+  });
 }
 
 export async function getWidgets(): Promise<Widgets> {
@@ -143,6 +147,7 @@ export async function getWidgets(): Promise<Widgets> {
         handle: c.handle,
         name: c.name,
         avatarUrl: c.avatarUrl,
+        profileUrl: profileUrl(c.handle, safeJson(c.links) || []),
         clicks: grouped[0]._count.creatorId,
       };
   }
@@ -156,7 +161,13 @@ export async function getWidgets(): Promise<Widgets> {
       : 0;
     const secs = Math.max(c.longestReignSecs, ongoing);
     if (secs > 0 && (!longestReign || secs > longestReign.secs)) {
-      longestReign = { handle: c.handle, name: c.name, avatarUrl: c.avatarUrl, secs };
+      longestReign = {
+        handle: c.handle,
+        name: c.name,
+        avatarUrl: c.avatarUrl,
+        profileUrl: profileUrl(c.handle, safeJson(c.links) || []),
+        secs,
+      };
     }
   }
 
@@ -168,6 +179,7 @@ export async function getWidgets(): Promise<Widgets> {
         handle: king.handle,
         name: king.name,
         avatarUrl: king.avatarUrl,
+        profileUrl: profileUrl(king.handle, safeJson(king.links) || []),
         amountCents: king.currentAmountCents,
       }
     : null;

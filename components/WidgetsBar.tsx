@@ -16,11 +16,13 @@ function Card({
   label,
   value,
   handle,
+  profileUrl,
 }: {
   emoji: string;
   label: string;
   value: string;
   handle?: string;
+  profileUrl?: string;
 }) {
   return (
     <div className="card-hard flex-1 rounded-xl bg-cream-200 p-3">
@@ -32,10 +34,10 @@ function Card({
       <p className="truncate text-xs text-[color:var(--color-ink-soft)]">
         {handle ? (
           <a
-            href={`https://instagram.com/${handle}`}
+            href={profileUrl || `https://instagram.com/${handle}`}
             target="_blank"
             rel="noopener noreferrer"
-            title={`Ver @${handle} no Instagram`}
+            title={`Ver perfil de @${handle}`}
             className="text-violet hover:underline"
           >
             @{handle}
@@ -59,18 +61,21 @@ export default function WidgetsBar({ widgets }: { widgets: Widgets | null }) {
         label={T.widgetMostClicked}
         value={mostClicked24h ? String(mostClicked24h.clicks) : "—"}
         handle={mostClicked24h?.handle}
+        profileUrl={mostClicked24h?.profileUrl}
       />
       <Card
         emoji="🕐"
         label={T.widgetLongestReign}
         value={longestReign ? fmtDuration(longestReign.secs) : "—"}
         handle={longestReign?.handle}
+        profileUrl={longestReign?.profileUrl}
       />
       <Card
         emoji="😎"
         label={T.widgetBiggestEgo}
         value={biggestEgo ? formatBRL(biggestEgo.amountCents) : "—"}
         handle={biggestEgo?.handle}
+        profileUrl={biggestEgo?.profileUrl}
       />
     </div>
   );

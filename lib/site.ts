@@ -31,6 +31,17 @@ export function priceToBeat(currentAmountCents: number): number {
   return currentAmountCents + step;
 }
 
+// URL del perfil del creador: usa el primer link guardado (Instagram, TikTok,
+// lo que sea) y, si no hay, cae en Instagram por el @.
+export function profileUrl(
+  handle: string,
+  links?: { url: string }[]
+): string {
+  const first = links?.find((l) => l.url && /^https?:\/\//i.test(l.url));
+  if (first) return first.url;
+  return `https://instagram.com/${handle}`;
+}
+
 export function formatBRL(cents: number): string {
   return (cents / 100).toLocaleString("pt-BR", {
     style: "currency",
