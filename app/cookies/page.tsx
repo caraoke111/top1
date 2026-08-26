@@ -2,7 +2,7 @@ import Link from "next/link";
 import { SITE } from "@/lib/site";
 
 export const metadata = {
-  title: "Política de Cookies — LanceTop",
+  title: "Política de Cookies — EgoTop",
 };
 
 export default function Cookies() {

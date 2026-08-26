@@ -2,9 +2,9 @@
 // Cambiá SITE.name / SITE.tagline para renombrar todo el sitio.
 
 export const SITE = {
-  name: "LanceTop",
+  name: "EgoTop",
   tagline: "o ranking de criadores que o dinheiro decide",
-  domain: "lancetop.com",
+  domain: "egotop.lol",
   currency: "BRL",
   currencySymbol: "R$",
   locale: "pt-BR",

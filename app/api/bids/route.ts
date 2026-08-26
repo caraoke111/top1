@@ -91,7 +91,7 @@ export async function POST(req: Request) {
     charge = await provider.createCharge({
       bidId: bid.id,
       amountCents: b.amountCents,
-      description: `Impulso de perfil @${b.handle} — LanceTop`,
+      description: `Impulso de perfil @${b.handle} — EgoTop`,
       payerName: b.name,
     });
   } catch (e) {

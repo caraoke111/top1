@@ -2,7 +2,7 @@ import Link from "next/link";
 import { SITE } from "@/lib/site";
 
 export const metadata = {
-  title: "Política de Privacidade — LanceTop",
+  title: "Política de Privacidade — EgoTop",
 };
 
 export default function Privacidade() {
