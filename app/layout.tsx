@@ -25,7 +25,6 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://egotop.lol"),
   title: `${SITE.name} — ${SITE.tagline}`,
   description: SITE.tagline,
-  icons: { icon: "/egotop-icon.png", apple: "/egotop-icon.png" },
   openGraph: {
     title: `${SITE.name} — ${SITE.tagline}`,
     description: SITE.tagline,
