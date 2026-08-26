@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { RULES, formatBRL } from "@/lib/site";
+import { RULES, formatBRL, priceToBeat } from "@/lib/site";
 import type { RankRow } from "@/lib/types";
 
 const FLAGS = ["🇧🇷", "🇵🇹", "🇺🇸", "🇪🇸", "🇦🇷", "🇺🇾", "🌐"];
@@ -43,8 +43,8 @@ export default function BidModal({
   onClose: () => void;
   onPaid: () => void;
 }) {
-  // Monto mínimo para este lance (superar al rival, o el mínimo de entrada)
-  const minCents = Math.max(initialAmountCents ?? RULES.minEntryCents, RULES.minEntryCents);
+  // Monto base (contexto de apertura: entrar / robar un puesto)
+  const baseMin = Math.max(initialAmountCents ?? RULES.minEntryCents, RULES.minEntryCents);
 
   const [stage, setStage] = useState<Stage>("form");
   const [handle, setHandle] = useState(initialHandle ?? "");
@@ -54,7 +54,8 @@ export default function BidModal({
   const [country, setCountry] = useState("🇧🇷");
   const [category, setCategory] = useState("");
   const [linkUrl, setLinkUrl] = useState("");
-  const [reais, setReais] = useState<string>((minCents / 100).toFixed(2));
+  const [reais, setReais] = useState<string>((baseMin / 100).toFixed(2));
+  const [showSug, setShowSug] = useState(false);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [bid, setBid] = useState<BidResponse | null>(null);
@@ -97,8 +98,27 @@ export default function BidModal({
   // Monto elegido en centavos (a partir del texto en R$)
   const chosenCents = Math.round(parseFloat(reais.replace(",", ".") || "0") * 100);
 
-  // ── Previa do combate: dónde caés y a quién hundís ──
   const handleLower = handle.trim().toLowerCase().replace(/^@/, "");
+
+  // ── Autocompletado: creadores que ya están pujando ──
+  const suggestions = ranking
+    .filter((r) => {
+      if (!handleLower) return true;
+      return (
+        r.handle.includes(handleLower) ||
+        r.name.toLowerCase().includes(handleLower)
+      );
+    })
+    .slice(0, 6);
+  // ¿El @ escrito coincide con alguien del ranking? (turbinar/empujar)
+  const existingMatch = ranking.find((r) => r.handle === handleLower) || null;
+
+  // Mínimo dinámico: turbinar a alguien exige superar su puja actual
+  const minCents = existingMatch
+    ? priceToBeat(existingMatch.amountCents)
+    : baseMin;
+
+  // ── Previa do combate: dónde caés y a quién hundís ──
   const validBid = chosenCents >= minCents;
   const sortedOthers = [...ranking]
     .filter((r) => r.handle !== handleLower)
@@ -199,15 +219,81 @@ export default function BidModal({
             </p>
 
             <div className="mt-4 space-y-3">
-              <Field label="@ do criador *">
-                <input
-                  value={handle}
-                  onChange={(e) => setHandle(e.target.value)}
-                  placeholder="seuusuario"
-                  className="input"
-                  autoFocus
-                />
+              <Field label="@ do criador (o seu, ou quem você quer turbinar) *">
+                <div className="relative">
+                  <input
+                    value={handle}
+                    onChange={(e) => {
+                      setHandle(e.target.value);
+                      setShowSug(true);
+                    }}
+                    onFocus={() => setShowSug(true)}
+                    onBlur={() => setTimeout(() => setShowSug(false), 150)}
+                    placeholder="seuusuario"
+                    className="input"
+                    autoComplete="off"
+                    autoFocus
+                  />
+                  {showSug && suggestions.length > 0 && (
+                    <ul className="card-hard absolute z-10 mt-1 max-h-56 w-full overflow-y-auto rounded-lg bg-cream thin-scroll">
+                      <li className="border-b border-line px-3 py-1.5 font-mono text-[10px] uppercase tracking-wide text-[color:var(--color-ink-soft)]">
+                        Já no ranking — pague para turbinar
+                      </li>
+                      {suggestions.map((r) => (
+                        <li key={r.id}>
+                          <button
+                            type="button"
+                            onMouseDown={(e) => e.preventDefault()}
+                            onClick={() => {
+                              setHandle(r.handle);
+                              setReais(
+                                (priceToBeat(r.amountCents) / 100).toFixed(2)
+                              );
+                              setShowSug(false);
+                            }}
+                            className="flex w-full items-center gap-2 px-3 py-2 text-left hover:bg-cream-200"
+                          >
+                            <span className="grid h-7 w-7 shrink-0 place-items-center overflow-hidden rounded-full bg-[linear-gradient(135deg,#9b6ee8,#1c1915)] text-[10px] font-bold text-cream">
+                              {r.avatarUrl ? (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img
+                                  src={r.avatarUrl}
+                                  alt=""
+                                  className="h-full w-full object-cover"
+                                />
+                              ) : (
+                                r.name.slice(0, 2).toUpperCase()
+                              )}
+                            </span>
+                            <span className="min-w-0 flex-1">
+                              <span className="block truncate text-sm font-semibold">
+                                @{r.handle}
+                              </span>
+                              <span className="block truncate text-[11px] text-[color:var(--color-ink-soft)]">
+                                #{r.rank} · {r.name}
+                              </span>
+                            </span>
+                            <span className="shrink-0 font-mono text-xs font-semibold">
+                              {formatBRL(r.amountCents)}
+                            </span>
+                          </button>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+                {existingMatch && (
+                  <p className="mt-1 text-[11px] font-semibold text-[color:var(--color-flame)]">
+                    🚀 Você vai turbinar @{existingMatch.handle} (está em{" "}
+                    {formatBRL(existingMatch.amountCents)}). Pague mais para
+                    subi-lo.
+                  </p>
+                )}
               </Field>
+              {/* Los datos de perfil solo se piden al ENTRAR como creador nuevo.
+                  Si estás turbinando a alguien que ya está, se ocultan. */}
+              {!existingMatch && (
+              <>
               <Field label="Nome exibido">
                 <input
                   value={name}
@@ -275,6 +361,8 @@ export default function BidModal({
                   className="input"
                 />
               </Field>
+              </>
+              )}
 
               {/* Monto libre (sin tope) */}
               <Field label="Seu lance (R$) *">

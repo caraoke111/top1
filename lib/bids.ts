@@ -24,20 +24,13 @@ export async function applyPaidBid(bidId: string): Promise<void> {
     const existing = await tx.creator.findUnique({ where: { handle } });
 
     if (existing) {
-      // Solo sube si el nuevo monto supera al vigente
+      // El perfil queda BLOQUEADO tras el primer ingreso: cualquiera puede
+      // pagar para "turbinar" (subir) a un creador, pero NADIE puede cambiar
+      // su nombre/foto/bio. Solo sube el monto.
       const amount = Math.max(bid.amountCents, existing.currentAmountCents);
       await tx.creator.update({
         where: { id: existing.id },
-        data: {
-          currentAmountCents: amount,
-          // Permite refrescar datos de perfil si vinieron
-          name: payload.name || existing.name,
-          bio: payload.bio ?? existing.bio,
-          avatarUrl: payload.avatarUrl || existing.avatarUrl,
-          country: payload.country || existing.country,
-          category: payload.category || existing.category,
-          links: payload.links ? JSON.stringify(payload.links) : existing.links,
-        },
+        data: { currentAmountCents: amount },
       });
     } else {
       await tx.creator.create({
