@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { TIERS_CENTS, formatBRL } from "@/lib/site";
+import { RULES, formatBRL } from "@/lib/site";
 
 const FLAGS = ["🇧🇷", "🇵🇹", "🇺🇸", "🇪🇸", "🇦🇷", "🇺🇾", "🌐"];
 const CATEGORIES = [
@@ -40,10 +40,8 @@ export default function BidModal({
   onClose: () => void;
   onPaid: () => void;
 }) {
-  // El nivel mínimo seleccionable = el sugerido (próximo nivel sobre el rival)
-  const minTier = initialAmountCents ?? TIERS_CENTS[0];
-  const firstAllowed =
-    TIERS_CENTS.find((t) => t >= minTier) ?? TIERS_CENTS[TIERS_CENTS.length - 1];
+  // Monto mínimo para este lance (superar al rival, o el mínimo de entrada)
+  const minCents = Math.max(initialAmountCents ?? RULES.minEntryCents, RULES.minEntryCents);
 
   const [stage, setStage] = useState<Stage>("form");
   const [handle, setHandle] = useState(initialHandle ?? "");
@@ -53,7 +51,7 @@ export default function BidModal({
   const [country, setCountry] = useState("🇧🇷");
   const [category, setCategory] = useState("");
   const [linkUrl, setLinkUrl] = useState("");
-  const [tierCents, setTierCents] = useState<number>(firstAllowed);
+  const [reais, setReais] = useState<string>((minCents / 100).toFixed(2));
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [bid, setBid] = useState<BidResponse | null>(null);
@@ -93,10 +91,17 @@ export default function BidModal({
     };
   }, [stage, bid, onPaid]);
 
+  // Monto elegido en centavos (a partir del texto en R$)
+  const chosenCents = Math.round(parseFloat(reais.replace(",", ".") || "0") * 100);
+
   async function submit() {
     setError("");
     if (!handle.trim() || handle.trim().length < 2) {
       setError("Escolha um @ (mínimo 2 caracteres).");
+      return;
+    }
+    if (!chosenCents || chosenCents < minCents) {
+      setError(`O lance mínimo aqui é ${formatBRL(minCents)}.`);
       return;
     }
     setSubmitting(true);
@@ -106,7 +111,7 @@ export default function BidModal({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           handle,
-          amountCents: tierCents,
+          amountCents: chosenCents,
           name: name || undefined,
           bio: bio || undefined,
           avatarUrl: avatarUrl || undefined,
@@ -256,34 +261,40 @@ export default function BidModal({
                 />
               </Field>
 
-              {/* Selector de niveles */}
-              <Field label="Seu lance *">
-                <div className="grid grid-cols-4 gap-2">
-                  {TIERS_CENTS.map((t) => {
-                    const disabled = t < minTier;
-                    const active = t === tierCents;
-                    return (
+              {/* Monto libre */}
+              <Field label="Seu lance (R$) *">
+                <div className="relative">
+                  <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 font-mono text-lg text-[color:var(--color-ink-soft)]">
+                    R$
+                  </span>
+                  <input
+                    value={reais}
+                    onChange={(e) =>
+                      setReais(e.target.value.replace(/[^0-9.,]/g, ""))
+                    }
+                    inputMode="decimal"
+                    className="input pl-10 font-mono text-xl font-semibold"
+                  />
+                </div>
+                {/* Atajos rápidos */}
+                <div className="mt-2 flex flex-wrap gap-1.5">
+                  {[minCents, minCents + 100, minCents + 500, minCents + 2000].map(
+                    (c) => (
                       <button
-                        key={t}
+                        key={c}
                         type="button"
-                        disabled={disabled}
-                        onClick={() => setTierCents(t)}
-                        className={`rounded-lg border-2 py-2 font-mono text-sm font-semibold transition ${
-                          active
-                            ? "border-ink bg-ink text-cream"
-                            : disabled
-                            ? "cursor-not-allowed border-line text-line"
-                            : "border-ink bg-cream hover:bg-cream-200"
-                        }`}
-                        title={disabled ? "Menor que o necessário" : ""}
+                        onClick={() => setReais((c / 100).toFixed(2))}
+                        className="rounded-md border border-line px-2 py-1 font-mono text-xs hover:bg-cream-200"
                       >
-                        {formatBRL(t).replace("R$", "").trim()}
+                        {formatBRL(c)}
                       </button>
-                    );
-                  })}
+                    )
+                  )}
                 </div>
                 <p className="mt-1 text-[11px] text-[color:var(--color-ink-soft)]">
-                  Valores em R$. {targetName ? `Para passar ${targetName}, mínimo ${formatBRL(minTier)}.` : ""}
+                  {targetName
+                    ? `Para passar ${targetName}, mínimo ${formatBRL(minCents)}.`
+                    : `Lance mínimo: ${formatBRL(minCents)}.`}
                 </p>
               </Field>
             </div>
@@ -301,7 +312,7 @@ export default function BidModal({
             >
               {submitting
                 ? "Gerando pagamento…"
-                : `Pagar ${formatBRL(tierCents)}`}
+                : `Pagar ${formatBRL(chosenCents || 0)}`}
             </button>
           </>
         )}

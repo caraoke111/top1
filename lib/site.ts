@@ -10,39 +10,25 @@ export const SITE = {
   locale: "pt-BR",
 };
 
-// Niveles fijos de lance (centavos de R$). Obligatorio para Hotmart, que vende
-// productos con precio fijo: cada nivel = un producto/oferta en Hotmart.
-// Escala progresiva: R$5, 10, 25, 50, 100, 250, 500, 1000.
-export const TIERS_CENTS = [
-  500, 1000, 2500, 5000, 10000, 25000, 50000, 100000,
-] as const;
-
-// Reglas del juego (en centavos de R$)
+// Reglas del juego (en centavos de R$). Modelo de PUJA LIBRE: cualquier monto
+// desde el mínimo. Para superar a alguien se paga máx(+stepAbs, +stepPct).
+// (Con InfinitePay/Mercado Pago el monto es dinámico; Hotmart necesitaría niveles fijos.)
 export const RULES = {
-  minEntryCents: TIERS_CENTS[0], // primer nivel
-  maxTierCents: TIERS_CENTS[TIERS_CENTS.length - 1],
+  minEntryCents: 100, // R$1,00 mínimo para entrar
+  stepAbsCents: 100, // +R$1,00 mínimo para robar un puesto
+  stepPct: 0.05, // o +5%, lo que sea mayor
   rankingSize: 30, // cuántos puestos mostrar
   pixExpiryMins: 15,
   presenceWindowSecs: 30, // ventana para contar "en vivo"
 };
 
-// Menor nivel estrictamente mayor a un monto dado (para superar a alguien).
-// Si ya está en el nivel máximo, devuelve el máximo (no se puede subir más).
-export function nextTierAbove(currentAmountCents: number): number {
-  for (const t of TIERS_CENTS) {
-    if (t > currentAmountCents) return t;
-  }
-  return RULES.maxTierCents;
-}
-
-// ¿Es un nivel válido?
-export function isValidTier(cents: number): boolean {
-  return (TIERS_CENTS as readonly number[]).includes(cents);
-}
-
-// Cuánto hay que pagar para superar un monto dado (= próximo nivel).
+// Cuánto hay que pagar para superar un monto dado.
 export function priceToBeat(currentAmountCents: number): number {
-  return nextTierAbove(currentAmountCents);
+  const step = Math.max(
+    RULES.stepAbsCents,
+    Math.ceil((currentAmountCents * RULES.stepPct) / 100) * 100
+  );
+  return currentAmountCents + step;
 }
 
 export function formatBRL(cents: number): string {

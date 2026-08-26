@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { isValidTier, formatBRL } from "@/lib/site";
+import { RULES, formatBRL } from "@/lib/site";
 import { getPaymentProvider } from "@/lib/payments";
 
 export const runtime = "nodejs";
@@ -43,10 +43,10 @@ export async function POST(req: Request) {
   }
   const b = parsed.data;
 
-  // El monto debe ser uno de los niveles fijos (una oferta de Hotmart)
-  if (!isValidTier(b.amountCents)) {
+  // Monto mínimo para entrar
+  if (b.amountCents < RULES.minEntryCents) {
     return NextResponse.json(
-      { error: "Nível de lance inválido." },
+      { error: `O lance mínimo é ${formatBRL(RULES.minEntryCents)}.` },
       { status: 400 }
     );
   }

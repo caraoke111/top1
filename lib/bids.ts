@@ -177,10 +177,13 @@ export async function getWidgets(): Promise<Widgets> {
     orderBy: [{ currentAmountCents: "desc" }, { updatedAt: "asc" }],
     take: RULES.rankingSize,
   });
+  // Con lugar libre en el ranking, se entra desde el mínimo (R$1) y te ubicás
+  // abajo. Solo si el ranking está LLENO hay que superar al último para entrar.
   const last = bottom[bottom.length - 1];
-  const entryPriceCents = last
-    ? priceToBeat(last.currentAmountCents)
-    : RULES.minEntryCents;
+  const entryPriceCents =
+    bottom.length >= RULES.rankingSize && last
+      ? priceToBeat(last.currentAmountCents)
+      : RULES.minEntryCents;
 
   return { mostClicked24h, longestReign, biggestEgo, entryPriceCents };
 }
