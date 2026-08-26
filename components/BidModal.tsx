@@ -163,7 +163,7 @@ export default function BidModal({
       }
       setBid(json);
       setStage("checkout");
-      // En modo redirect, abrimos el checkout de Hotmart automáticamente
+      // En modo redirect, abrimos el checkout de InfinitePay automáticamente
       if (json.mode === "redirect" && json.checkoutUrl) {
         window.open(json.checkoutUrl, "_blank", "noopener,noreferrer");
       }
@@ -519,12 +519,12 @@ export default function BidModal({
               </>
             )}
 
-            {/* Modo redirect (Hotmart) */}
+            {/* Modo redirect (InfinitePay) */}
             {bid.mode === "redirect" && (
               <>
                 <p className="mt-4 text-sm text-[color:var(--color-ink-soft)]">
-                  Abrimos o checkout do Hotmart numa nova aba. Pague por lá (Pix,
-                  cartão ou boleto) e volte aqui — seu lance sobe sozinho.
+                  Abrimos o checkout numa nova aba. Pague por lá (Pix, cartão ou
+                  boleto) e volte aqui — seu lance sobe sozinho.
                 </p>
                 {bid.checkoutUrl && (
                   <a
@@ -533,7 +533,7 @@ export default function BidModal({
                     rel="noopener noreferrer"
                     className="btn-hard mt-4 block w-full rounded-xl bg-blood py-3 font-bold text-cream"
                   >
-                    Abrir checkout do Hotmart ↗
+                    Abrir checkout para pagar ↗
                   </a>
                 )}
               </>
