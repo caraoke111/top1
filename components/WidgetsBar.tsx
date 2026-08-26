@@ -15,12 +15,12 @@ function Card({
   emoji,
   label,
   value,
-  who,
+  handle,
 }: {
   emoji: string;
   label: string;
   value: string;
-  who: string;
+  handle?: string;
 }) {
   return (
     <div className="card-hard flex-1 rounded-xl bg-cream-200 p-3">
@@ -29,7 +29,21 @@ function Card({
         {label}
       </p>
       <p className="mt-1 font-mono text-xl font-semibold">{value}</p>
-      <p className="truncate text-xs text-[color:var(--color-ink-soft)]">{who}</p>
+      <p className="truncate text-xs text-[color:var(--color-ink-soft)]">
+        {handle ? (
+          <a
+            href={`https://instagram.com/${handle}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            title={`Ver @${handle} no Instagram`}
+            className="text-violet hover:underline"
+          >
+            @{handle}
+          </a>
+        ) : (
+          "—"
+        )}
+      </p>
     </div>
   );
 }
@@ -44,19 +58,19 @@ export default function WidgetsBar({ widgets }: { widgets: Widgets | null }) {
         emoji="🔥"
         label={T.widgetMostClicked}
         value={mostClicked24h ? String(mostClicked24h.clicks) : "—"}
-        who={mostClicked24h ? `@${mostClicked24h.handle}` : "—"}
+        handle={mostClicked24h?.handle}
       />
       <Card
         emoji="🕐"
         label={T.widgetLongestReign}
         value={longestReign ? fmtDuration(longestReign.secs) : "—"}
-        who={longestReign ? `@${longestReign.handle}` : "—"}
+        handle={longestReign?.handle}
       />
       <Card
         emoji="😎"
         label={T.widgetBiggestEgo}
         value={biggestEgo ? formatBRL(biggestEgo.amountCents) : "—"}
-        who={biggestEgo ? `@${biggestEgo.handle}` : "—"}
+        handle={biggestEgo?.handle}
       />
     </div>
   );

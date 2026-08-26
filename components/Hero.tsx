@@ -57,7 +57,19 @@ export default function Hero({
               O #1 por
             </p>
             <p className="truncate font-bold">
-              {king ? king.name : "ninguém ainda"}
+              {king ? (
+                <a
+                  href={`https://instagram.com/${king.handle}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title={`Ver @${king.handle} no Instagram`}
+                  className="hover:text-violet hover:underline"
+                >
+                  {king.name}
+                </a>
+              ) : (
+                "ninguém ainda"
+              )}
             </p>
           </div>
           <div className="font-mono text-2xl font-semibold">

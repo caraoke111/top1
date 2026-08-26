@@ -58,7 +58,15 @@ function Row({
           {row.country && <span>{row.country}</span>}
         </p>
         <p className="truncate text-xs text-[color:var(--color-ink-soft)]">
-          @{row.handle}
+          <a
+            href={`https://instagram.com/${row.handle}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            title={`Ver @${row.handle} no Instagram`}
+            className="text-violet hover:underline"
+          >
+            @{row.handle}
+          </a>
           {row.category ? ` · ${row.category}` : ""}
         </p>
         {row.bio && (
