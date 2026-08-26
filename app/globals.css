@@ -1,0 +1,114 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-marker: var(--font-marker), cursive;
+  --font-mono: var(--font-mono), ui-monospace, monospace;
+
+  --color-cream: #faf6f1;
+  --color-cream-200: #f2ece3;
+  --color-ink: #1c1915;
+  --color-ink-soft: #6b6459;
+  --color-line: #e4dcd0;
+
+  --color-flame: #f09433;
+  --color-blood: #dc2743;
+  --color-magenta: #bc1888;
+  --color-violet: #9b6ee8;
+  --color-mint: #57b894;
+  --color-gold: #e8b93a;
+}
+
+:root {
+  --grad-flame: linear-gradient(45deg, #f09433, #dc2743, #bc1888);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  /* textura sutil de papel */
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    rgba(28, 25, 21, 0.04) 1px,
+    transparent 0
+  );
+  background-size: 22px 22px;
+}
+
+.font-marker {
+  font-family: var(--font-marker);
+}
+.font-mono {
+  font-family: var(--font-mono);
+}
+
+.grad-text {
+  background: var(--grad-flame);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Botón con borde grueso estilo "sticker" */
+.btn-hard {
+  border: 2px solid var(--color-ink);
+  box-shadow: 3px 3px 0 var(--color-ink);
+  transition: transform 0.08s ease, box-shadow 0.08s ease;
+}
+.btn-hard:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0 var(--color-ink);
+}
+.btn-hard:active {
+  transform: translate(2px, 2px);
+  box-shadow: 1px 1px 0 var(--color-ink);
+}
+
+.card-hard {
+  border: 2px solid var(--color-ink);
+  box-shadow: 4px 4px 0 var(--color-ink);
+}
+
+@keyframes pulse-live {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+.live-dot {
+  animation: pulse-live 1.4s ease-in-out infinite;
+}
+
+@keyframes rowflash {
+  0% {
+    background-color: rgba(232, 185, 58, 0.55);
+  }
+  100% {
+    background-color: transparent;
+  }
+}
+.row-flash {
+  animation: rowflash 1.6s ease-out;
+}
+
+/* scrollbar de la lista */
+.thin-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+.thin-scroll::-webkit-scrollbar-thumb {
+  background: var(--color-line);
+  border-radius: 8px;
+}

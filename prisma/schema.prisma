@@ -1,0 +1,90 @@
+// Prisma schema — CreatorBid / LanceTop
+//
+// Base: PostgreSQL (Neon / Supabase / Vercel Postgres).
+// En .env: DATABASE_URL="postgresql://user:pass@host/db?sslmode=require"
+// Neon funciona igual desde tu PC (local) y desde Vercel (prod): una sola base.
+//
+// Setup:
+//   npm run db:push    # crea las tablas
+//   npm run db:seed    # datos de ejemplo
+//
+// (Para volver a SQLite offline: provider="sqlite" + DATABASE_URL="file:./dev.db")
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Creator {
+  id               String   @id @default(cuid())
+  handle           String   @unique // sin @, en minúsculas
+  name             String
+  bio              String   @default("")
+  avatarUrl        String   @default("")
+  country          String   @default("") // emoji bandera, ej "🇧🇷"
+  category         String   @default("") // ej "💻 Tecnologia"
+  verified         Boolean  @default(false)
+  links            String   @default("[]") // JSON: [{ "type": "youtube", "url": "..." }]
+
+  currentAmountCents Int    @default(0) // puja vigente (centavos de R$)
+  clicks             Int    @default(0) // total histórico
+
+  // Métricas de reinado (#1)
+  reignStartedAt     DateTime? // cuándo llegó al #1 (null si nunca / ya no)
+  longestReignSecs   Int       @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  bids        Bid[]
+  clickEvents ClickEvent[]
+
+  @@index([currentAmountCents])
+}
+
+model Bid {
+  id          String   @id @default(cuid())
+  creator     Creator? @relation(fields: [creatorId], references: [id])
+  creatorId   String?
+
+  // Snapshot del creador al momento de pujar (para nuevos ingresos)
+  handle      String
+  amountCents Int
+
+  status      String   @default("pending") // pending | paid | expired | failed
+  provider    String   @default("sandbox") // sandbox | dlocal | mercadopago | stripe
+  providerRef String   @default("")        // id externo de la transacción
+
+  // Datos Pix (sandbox o real)
+  pixQr       String   @default("") // dataURL del QR
+  pixCode     String   @default("") // copia-e-cola
+  expiresAt   DateTime?
+
+  // Payload del creador para aplicar al confirmar el pago (JSON)
+  payload     String   @default("{}")
+
+  createdAt   DateTime @default(now())
+  paidAt      DateTime?
+
+  @@index([status])
+}
+
+model ClickEvent {
+  id        String   @id @default(cuid())
+  creator   Creator  @relation(fields: [creatorId], references: [id])
+  creatorId String
+  createdAt DateTime @default(now())
+
+  @@index([creatorId, createdAt])
+}
+
+model Presence {
+  id        String   @id // sessionId del visitante
+  lastSeen  DateTime @default(now())
+
+  @@index([lastSeen])
+}
