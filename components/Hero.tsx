@@ -1,15 +1,18 @@
 "use client";
 
+import Link from "next/link";
 import { SITE, T, formatBRL } from "@/lib/site";
-import type { RankRow } from "@/lib/types";
+import type { RankRow, Stats } from "@/lib/types";
 
 export default function Hero({
   liveCount,
   king,
+  stats,
   onEnter,
 }: {
   liveCount: number;
   king: RankRow | null;
+  stats: Stats | null;
   onEnter: () => void;
 }) {
   return (
@@ -21,6 +24,34 @@ export default function Hero({
           <span className="live-dot inline-block h-2 w-2 rounded-full bg-blood" />
           {T.live} · {liveCount} {liveCount === 1 ? "olho" : "olhos"}
         </span>
+      </div>
+
+      {/* barra de stats */}
+      <div className="flex justify-center px-4 pb-2">
+        <div className="flex max-w-full flex-wrap items-center justify-center gap-x-2.5 gap-y-1 rounded-full border-2 border-ink bg-cream-200 px-4 py-1.5 font-mono text-[11px] text-[color:var(--color-ink-soft)]">
+          <span className="flex items-center gap-1.5">
+            <span className="live-dot inline-block h-1.5 w-1.5 rounded-full bg-mint" />
+            <b className="text-ink">{liveCount}</b> online
+          </span>
+          <span className="opacity-40">·</span>
+          <span>
+            <b className="text-ink">
+              {formatBRL(stats?.bidTodayCents ?? 0)}
+            </b>{" "}
+            pujado hoje
+          </span>
+          <span className="opacity-40">·</span>
+          <span>
+            <b className="text-ink">
+              {(stats?.totalClicks ?? 0).toLocaleString("pt-BR")}
+            </b>{" "}
+            cliques
+          </span>
+          <span className="opacity-40">·</span>
+          <Link href="/stats" className="font-semibold text-flame hover:underline">
+            ver stats ↗
+          </Link>
+        </div>
       </div>
 
       <div className="mx-auto max-w-3xl px-4 pb-12 pt-6 text-center">

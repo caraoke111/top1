@@ -46,8 +46,16 @@ export interface Widgets {
   entryPriceCents: number;
 }
 
+export interface Stats {
+  bidTodayCents: number;
+  totalClicks: number;
+  creators: number;
+  totalRaisedCents: number;
+}
+
 export interface RankingResponse {
   ranking: RankRow[];
   widgets: Widgets;
   liveCount: number;
+  stats: Stats;
 }

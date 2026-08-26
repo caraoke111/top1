@@ -193,6 +193,32 @@ export async function getWidgets(): Promise<Widgets> {
   return { mostClicked24h, longestReign, biggestEgo, entryPriceCents };
 }
 
+// Métricas globales para la barra de stats.
+export async function getStats(): Promise<{
+  bidTodayCents: number;
+  totalClicks: number;
+  creators: number;
+  totalRaisedCents: number;
+}> {
+  const startToday = new Date();
+  startToday.setHours(0, 0, 0, 0);
+  const [paidToday, clicksAgg, creators, egoAgg] = await Promise.all([
+    prisma.bid.aggregate({
+      _sum: { amountCents: true },
+      where: { status: "paid", paidAt: { gte: startToday } },
+    }),
+    prisma.creator.aggregate({ _sum: { clicks: true } }),
+    prisma.creator.count(),
+    prisma.creator.aggregate({ _sum: { currentAmountCents: true } }),
+  ]);
+  return {
+    bidTodayCents: paidToday._sum.amountCents ?? 0,
+    totalClicks: clicksAgg._sum.clicks ?? 0,
+    creators,
+    totalRaisedCents: egoAgg._sum.currentAmountCents ?? 0,
+  };
+}
+
 // ── helpers ───────────────────────────────────────────────────
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type PrismaTx = any;

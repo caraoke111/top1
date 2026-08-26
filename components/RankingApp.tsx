@@ -89,6 +89,7 @@ export default function RankingApp() {
       <Hero
         liveCount={data?.liveCount ?? 0}
         king={data?.ranking[0] ?? null}
+        stats={data?.stats ?? null}
         onEnter={openEnter}
       />
 
