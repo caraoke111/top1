@@ -141,6 +141,15 @@ export default function RankingApp() {
           <p className="mt-2 font-marker text-lg">
             {SITE.name} — {SITE.tagline}.
           </p>
+          <p className="mt-4 flex items-center justify-center gap-3 font-mono text-xs text-[color:var(--color-ink-soft)]">
+            <a href="/privacidade" className="hover:text-ink hover:underline">
+              Privacidade
+            </a>
+            <span>·</span>
+            <a href="/cookies" className="hover:text-ink hover:underline">
+              Cookies
+            </a>
+          </p>
         </footer>
       </div>
 
@@ -149,6 +158,7 @@ export default function RankingApp() {
           initialHandle={modal.handle}
           initialAmountCents={modal.amountCents}
           targetName={modal.targetName}
+          ranking={data?.ranking ?? []}
           onClose={() => setModal({ open: false })}
           onPaid={() => {
             setModal({ open: false });

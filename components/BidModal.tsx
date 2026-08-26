@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { RULES, formatBRL } from "@/lib/site";
+import type { RankRow } from "@/lib/types";
 
 const FLAGS = ["🇧🇷", "🇵🇹", "🇺🇸", "🇪🇸", "🇦🇷", "🇺🇾", "🌐"];
 const CATEGORIES = [
@@ -31,12 +32,14 @@ export default function BidModal({
   initialHandle,
   initialAmountCents,
   targetName,
+  ranking = [],
   onClose,
   onPaid,
 }: {
   initialHandle?: string;
   initialAmountCents?: number;
   targetName?: string;
+  ranking?: RankRow[];
   onClose: () => void;
   onPaid: () => void;
 }) {
@@ -93,6 +96,18 @@ export default function BidModal({
 
   // Monto elegido en centavos (a partir del texto en R$)
   const chosenCents = Math.round(parseFloat(reais.replace(",", ".") || "0") * 100);
+
+  // ── Previa do combate: dónde caés y a quién hundís ──
+  const handleLower = handle.trim().toLowerCase().replace(/^@/, "");
+  const validBid = chosenCents >= minCents;
+  const sortedOthers = [...ranking]
+    .filter((r) => r.handle !== handleLower)
+    .sort((a, b) => b.amountCents - a.amountCents);
+  let insertIdx = sortedOthers.findIndex((r) => chosenCents > r.amountCents);
+  if (insertIdx === -1) insertIdx = sortedOthers.length;
+  const myRank = insertIdx + 1;
+  const aboveRow = insertIdx > 0 ? sortedOthers[insertIdx - 1] : null;
+  const sunkRow = insertIdx < sortedOthers.length ? sortedOthers[insertIdx] : null;
 
   async function submit() {
     setError("");
@@ -299,10 +314,51 @@ export default function BidModal({
                     ))}
                 </div>
                 <p className="mt-1 text-[11px] text-[color:var(--color-ink-soft)]">
-                  {targetName
-                    ? `Para passar ${targetName}, mínimo ${formatBRL(minCents)}. Sem teto — o céu é o limite.`
-                    : `Lance mínimo: ${formatBRL(minCents)}. Sem teto — aposte quanto quiser.`}
+                  Lance mínimo: {formatBRL(minCents)}. Sem teto — aposte quanto quiser.
                 </p>
+
+                {/* Prévia do combate */}
+                {validBid && (
+                  <div className="mt-3 overflow-hidden rounded-lg border-2 border-ink bg-ink text-cream">
+                    <div className="flex items-center justify-between px-3 py-1.5 font-mono text-[9px] uppercase tracking-wide text-cream/60">
+                      <span>⚔️ Prévia do combate</span>
+                      <span className="flex items-center gap-1">
+                        <span className="live-dot inline-block h-1.5 w-1.5 rounded-full bg-blood" />
+                        ao vivo
+                      </span>
+                    </div>
+                    {aboveRow && (
+                      <CombatRow
+                        rank={myRank - 1}
+                        handle={aboveRow.handle}
+                        amount={aboveRow.amountCents}
+                      />
+                    )}
+                    <CombatRow
+                      rank={myRank}
+                      handle={handleLower || "você"}
+                      amount={chosenCents}
+                      me
+                    />
+                    {sunkRow && (
+                      <CombatRow
+                        rank={myRank + 1}
+                        handle={sunkRow.handle}
+                        amount={sunkRow.amountCents}
+                        sunk
+                      />
+                    )}
+                  </div>
+                )}
+                {validBid && (
+                  <p className="mt-2 text-[11px] font-semibold text-[color:var(--color-flame)]">
+                    {myRank === 1
+                      ? `Com ${formatBRL(chosenCents)} você vira o #1 👑`
+                      : sunkRow
+                      ? `Você entra no #${myRank} e afunda @${sunkRow.handle} 🔥`
+                      : `Você entra no #${myRank}.`}
+                  </p>
+                )}
               </Field>
             </div>
 
@@ -451,5 +507,38 @@ function Field({
       </span>
       {children}
     </label>
+  );
+}
+
+function CombatRow({
+  rank,
+  handle,
+  amount,
+  me,
+  sunk,
+}: {
+  rank: number;
+  handle: string;
+  amount: number;
+  me?: boolean;
+  sunk?: boolean;
+}) {
+  return (
+    <div
+      className={`flex items-center gap-2 px-3 py-2 font-mono text-xs ${
+        me
+          ? "bg-flame font-bold text-ink"
+          : sunk
+          ? "text-cream/45 line-through decoration-cream/30"
+          : "text-cream/70"
+      }`}
+    >
+      <span className="w-6 shrink-0">#{rank}</span>
+      <span className="flex-1 truncate">
+        {me ? "você" : `@${handle}`} {sunk && "↓"}
+        {me && " ↑"}
+      </span>
+      <span className="shrink-0">{formatBRL(amount)}</span>
+    </div>
   );
 }
