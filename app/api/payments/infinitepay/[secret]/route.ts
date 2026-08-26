@@ -67,7 +67,9 @@ export async function POST(
     slug: slug ? String(slug) : undefined,
   });
   if (!check || !check.paid) {
-    return NextResponse.json({ status: "not_paid" }, { status: 202 });
+    // Aún no confirmado (posible desfase). Respondemos 400 para que
+    // InfinitePay REINTENTE el webhook y demos tiempo a que se confirme.
+    return NextResponse.json({ status: "not_paid_retry" }, { status: 400 });
   }
 
   // ── Capa 3: el monto debe cubrir el lance ────────────────────
