@@ -1,5 +1,5 @@
 {
   "crons": [
-    { "path": "/api/cron/king-watch", "schedule": "*/5 * * * *" }
+    { "path": "/api/cron/king-watch", "schedule": "0 12 * * *" }
   ]
 }
