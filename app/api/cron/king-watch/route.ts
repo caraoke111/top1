@@ -90,14 +90,17 @@ export async function GET(req: Request) {
     orderBy: { scheduledAt: "asc" },
     take: MAX_POR_RUN,
   });
+  const cuentasTok = getIgAccounts();
   const posteos: unknown[] = [];
   for (const job of vencidos) {
     try {
+      const cta = cuentasTok.find((a) => a.igUserId === job.igUserId);
       const postId = await postImageToAccount({
         igUserId: job.igUserId,
         imageUrl: job.imageUrl,
         caption: job.caption,
         userTags: job.userTags ? JSON.parse(job.userTags) : undefined,
+        token: cta?.token,
       });
       await prisma.postJob.update({ where: { id: job.id }, data: { status: "done", postId } });
       posteos.push({ handle: job.handle, ok: true, postId });

@@ -8,6 +8,7 @@ const V = process.env.INSTAGRAM_API_VERSION || "v23.0";
 export interface IgAccount {
   igUserId: string;
   handle: string;
+  token?: string; // token permanente de la página (opcional; si no, usa el global)
 }
 
 export function getIgAccounts(): IgAccount[] {
@@ -20,9 +21,9 @@ export function getIgAccounts(): IgAccount[] {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function call(ruta: string, method: "GET" | "POST", params: Record<string, any>) {
-  const token = process.env.INSTAGRAM_TOKEN;
-  if (!token) throw new Error("Falta INSTAGRAM_TOKEN");
+async function call(ruta: string, method: "GET" | "POST", params: Record<string, any>, tk?: string) {
+  const token = tk || process.env.INSTAGRAM_TOKEN;
+  if (!token) throw new Error("Falta token de Instagram");
   const url = new URL(`${BASE}/${V}/${ruta}`);
   const body = new URLSearchParams();
   body.set("access_token", token);
@@ -42,18 +43,19 @@ async function crearContenedor(
   igUserId: string,
   imageUrl: string,
   caption: string,
-  userTags?: { username: string; x: number; y: number }[]
+  userTags?: { username: string; x: number; y: number }[],
+  tk?: string
 ) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const params: Record<string, any> = { image_url: imageUrl, caption };
   if (userTags && userTags.length) params.user_tags = JSON.stringify(userTags);
-  const r = await call(`${igUserId}/media`, "POST", params);
+  const r = await call(`${igUserId}/media`, "POST", params, tk);
   return r.id as string;
 }
 
-async function esperarListo(contenedorId: string) {
+async function esperarListo(contenedorId: string, tk?: string) {
   for (let i = 0; i < 20; i++) {
-    const r = await call(contenedorId, "GET", { fields: "status_code" });
+    const r = await call(contenedorId, "GET", { fields: "status_code" }, tk);
     if (r.status_code === "FINISHED" || r.status_code === "PUBLISHED") return;
     if (r.status_code === "ERROR") throw new Error("Instagram rechazó la imagen");
     await new Promise((s) => setTimeout(s, 2500));
@@ -67,18 +69,20 @@ export async function postImageToAccount(input: {
   imageUrl: string;
   caption: string;
   userTags?: { username: string; x: number; y: number }[];
+  token?: string;
 }): Promise<string> {
+  const tk = input.token;
   let contenedorId: string;
   try {
-    contenedorId = await crearContenedor(input.igUserId, input.imageUrl, input.caption, input.userTags);
+    contenedorId = await crearContenedor(input.igUserId, input.imageUrl, input.caption, input.userTags, tk);
   } catch (e) {
     if (input.userTags && input.userTags.length) {
-      contenedorId = await crearContenedor(input.igUserId, input.imageUrl, input.caption);
+      contenedorId = await crearContenedor(input.igUserId, input.imageUrl, input.caption, undefined, tk);
     } else {
       throw e;
     }
   }
-  await esperarListo(contenedorId);
-  const pub = await call(`${input.igUserId}/media_publish`, "POST", { creation_id: contenedorId });
+  await esperarListo(contenedorId, tk);
+  const pub = await call(`${input.igUserId}/media_publish`, "POST", { creation_id: contenedorId }, tk);
   return pub.id as string;
 }
