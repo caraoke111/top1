@@ -142,7 +142,33 @@ export default function RankingApp() {
           <p className="mt-2 font-marker text-lg">
             {SITE.name} — {SITE.tagline}.
           </p>
-          <p className="mt-4 flex items-center justify-center gap-3 font-mono text-xs text-[color:var(--color-ink-soft)]">
+          <p className="mt-4 flex flex-wrap items-center justify-center gap-4 font-mono text-sm font-semibold">
+            <a
+              href="https://instagram.com/topego.br"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-flame hover:underline"
+            >
+              Instagram
+            </a>
+            <a
+              href="https://x.com/EgoTopvx68"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-flame hover:underline"
+            >
+              X
+            </a>
+            <a
+              href="https://www.linkedin.com/in/ego-top-a83865431/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-flame hover:underline"
+            >
+              LinkedIn
+            </a>
+          </p>
+          <p className="mt-3 flex items-center justify-center gap-3 font-mono text-xs text-[color:var(--color-ink-soft)]">
             <a href="/privacidade" className="hover:text-ink hover:underline">
               Privacidade
             </a>
