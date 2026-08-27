@@ -28,6 +28,15 @@ export async function GET(req: Request) {
   const base = process.env.NEXT_PUBLIC_BASE_URL || "https://egotop.lol";
   const resumen: Record<string, unknown> = {};
 
+  // Latido: marca que el cron corrió (para monitoreo)
+  const ahora0 = new Date();
+  await prisma.kingState.upsert({
+    where: { id: "king" },
+    create: { id: "king", lastCheckedAt: ahora0 },
+    update: { lastCheckedAt: ahora0 },
+  });
+  resumen.lastCheckedAt = ahora0.toISOString();
+
   // ── 1. ¿Cambió el #1? ────────────────────────────────────────
   const rey = await prisma.creator.findFirst({
     orderBy: [{ currentAmountCents: "desc" }, { updatedAt: "asc" }],

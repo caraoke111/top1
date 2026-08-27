@@ -91,11 +91,12 @@ model Presence {
 
 // Estado del auto-post del #1 (loop viral). Fila única (id "king").
 model KingState {
-  id          String    @id @default("king")
-  handle      String    @default("")
-  amountCents Int       @default(0)
-  lastPostAt  DateTime?
-  updatedAt   DateTime  @updatedAt
+  id            String    @id @default("king")
+  handle        String    @default("")
+  amountCents   Int       @default(0)
+  lastPostAt    DateTime?
+  lastCheckedAt DateTime? // "latido": se actualiza en cada corrida del cron
+  updatedAt     DateTime  @updatedAt
 }
 
 // Cola de posteos escalonados (para NO postear a todas las cuentas a la vez).
