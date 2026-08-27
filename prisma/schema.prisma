@@ -96,6 +96,8 @@ model KingState {
   amountCents   Int       @default(0)
   lastPostAt    DateTime?
   lastCheckedAt DateTime? // "latido": se actualiza en cada corrida del cron
+  lastDailyAt   DateTime? // último post de contenido diario (reinado)
+  lastWeeklyAt  DateTime? // último post de contenido semanal (top 5)
   updatedAt     DateTime  @updatedAt
 }
 

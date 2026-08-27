@@ -5,6 +5,8 @@ const nextConfig: NextConfig = {
   // viajar dentro de las funciones serverless de Vercel.
   outputFileTracingIncludes: {
     "/api/king-card.png": ["./lib/PermanentMarker.ttf"],
+    "/api/reinado-card.png": ["./lib/PermanentMarker.ttf"],
+    "/api/top5-card.png": ["./lib/PermanentMarker.ttf"],
     "/api/cron/king-watch": ["./lib/PermanentMarker.ttf"],
   },
   // sharp es un binario nativo: que no lo intente empaquetar el bundler.

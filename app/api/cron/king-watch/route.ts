@@ -93,6 +93,48 @@ export async function GET(req: Request) {
     resumen.deteccion = "sin cambios en el #1";
   }
 
+  // ── 1.5 Contenido programado (diario reinado / semanal top5) ──
+  const now = new Date();
+  const hourUTC = now.getUTCHours();
+  const dayUTC = now.getUTCDay(); // 0=dom, 1=lun
+  const st = await prisma.kingState.findUnique({ where: { id: "king" } });
+  const cuentasC = getIgAccounts();
+  const hoy = now.toISOString().slice(0, 10);
+
+  async function encolarContenido(imageUrl: string, caption: string) {
+    const t0 = Date.now();
+    await prisma.postJob.createMany({
+      data: cuentasC.map((c, i) => ({
+        igUserId: c.igUserId,
+        handle: c.handle || "",
+        imageUrl,
+        caption,
+        scheduledAt: new Date(t0 + i * STAGGER_MIN * 60000),
+      })),
+    });
+  }
+
+  // Diario ~13 UTC (10:00 BRT): tarjeta de reinado
+  if (cuentasC.length && hourUTC >= 13 && (!st?.lastDailyAt || st.lastDailyAt.toISOString().slice(0, 10) !== hoy)) {
+    const h = rey ? "@" + rey.handle.replace(/^@/, "") : "o topo";
+    await encolarContenido(
+      `${base}/api/reinado-card.png?t=${Date.now()}`,
+      `👑 O reinado continua! ${h} segue no #1 do EgoTop. Ninguém tem coragem de destronar? Prove. 🔥\n\n#egotop #ranking #top1 #brasil #criadores`
+    );
+    await prisma.kingState.update({ where: { id: "king" }, data: { lastDailyAt: now } });
+    resumen.diario = "reinado encolado";
+  }
+
+  // Semanal, lunes ~14 UTC: top 5
+  if (cuentasC.length && dayUTC === 1 && hourUTC >= 14 && (!st?.lastWeeklyAt || Date.now() - st.lastWeeklyAt.getTime() > 6 * 86400000)) {
+    await encolarContenido(
+      `${base}/api/top5-card.png?t=${Date.now()}`,
+      `🏆 TOP 5 da semana no EgoTop! Quem paga mais, domina o ranking. Seu nome merece estar aí. 👑\n\negotop.lol\n#egotop #ranking #brasil #criadores`
+    );
+    await prisma.kingState.update({ where: { id: "king" }, data: { lastWeeklyAt: now } });
+    resumen.semanal = "top5 encolado";
+  }
+
   // ── 2. Procesar posteos vencidos (escalonado) ────────────────
   const vencidos = await prisma.postJob.findMany({
     where: { status: "pending", scheduledAt: { lte: new Date() } },
