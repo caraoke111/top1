@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Hanken_Grotesk, Permanent_Marker, IBM_Plex_Mono } from "next/font/google";
 import { SITE } from "@/lib/site";
 import "./globals.css";
@@ -49,6 +50,19 @@ export default function RootLayout({
     <html lang="pt-BR">
       <body className={`${sans.variable} ${marker.variable} ${mono.variable}`}>
         {children}
+        {/* Google Analytics (gtag.js) */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-56S4R8ERPT"
+          strategy="afterInteractive"
+        />
+        <Script id="ga-gtag" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-56S4R8ERPT');
+          `}
+        </Script>
       </body>
     </html>
   );
