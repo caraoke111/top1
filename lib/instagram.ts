@@ -9,6 +9,23 @@ export interface IgAccount {
   igUserId: string;
   handle: string;
   token?: string; // token permanente de la página (opcional; si no, usa el global)
+  pageId?: string; // página de Facebook vinculada (para postear también en FB)
+}
+
+// Postea una foto en la PÁGINA de Facebook (feed). Usa el token de la página.
+export async function postPhotoToPage(input: {
+  pageId: string;
+  imageUrl: string;
+  caption: string;
+  token?: string;
+}): Promise<string> {
+  const r = await call(
+    `${input.pageId}/photos`,
+    "POST",
+    { url: input.imageUrl, caption: input.caption, published: "true" },
+    input.token
+  );
+  return (r.post_id || r.id) as string;
 }
 
 export function getIgAccounts(): IgAccount[] {

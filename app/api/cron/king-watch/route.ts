@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getIgAccounts, postImageToAccount } from "@/lib/instagram";
+import { getIgAccounts, postImageToAccount, postPhotoToPage } from "@/lib/instagram";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -153,8 +153,22 @@ export async function GET(req: Request) {
         userTags: job.userTags ? JSON.parse(job.userTags) : undefined,
         token: cta?.token,
       });
+      // También en la página de Facebook (best-effort: si falla, no rompe el job)
+      let fb: string | null = null;
+      if (cta?.pageId) {
+        try {
+          fb = await postPhotoToPage({
+            pageId: cta.pageId,
+            imageUrl: job.imageUrl,
+            caption: job.caption,
+            token: cta.token,
+          });
+        } catch {
+          fb = null;
+        }
+      }
       await prisma.postJob.update({ where: { id: job.id }, data: { status: "done", postId } });
-      posteos.push({ handle: job.handle, ok: true, postId });
+      posteos.push({ handle: job.handle, ok: true, postId, fb });
     } catch (e) {
       const msg = e instanceof Error ? e.message : String(e);
       await prisma.postJob.update({ where: { id: job.id }, data: { status: "failed", error: msg } });
